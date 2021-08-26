@@ -16,6 +16,7 @@ namespace todozulu.Functions.Functions
 {
     public static class TodoApi
     {
+        // create a todo
         [FunctionName(nameof(CreateTodo))]
         public static async Task<IActionResult> CreateTodo(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "todo")] HttpRequest req,
@@ -60,6 +61,7 @@ namespace todozulu.Functions.Functions
             });
         }
 
+        // Update a specific todo
         [FunctionName(nameof(UpdateTodo))]
         public static async Task<IActionResult> UpdateTodo(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "todo/{id}")] HttpRequest req,
@@ -107,6 +109,61 @@ namespace todozulu.Functions.Functions
                 Result = todoEntity
             });
         }
+
+        // get all todos
+        [FunctionName(nameof(GetAllTodo))]
+        public static async Task<IActionResult> GetAllTodo(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "todo")] HttpRequest req,
+        [Table("todo", Connection = "AzureWebJobsStorage")] CloudTable todoTable,
+        ILogger log)
+            {
+                log.LogInformation($"Get all todos received");
+
+                TableQuery<TodoEntity> query = new TableQuery<TodoEntity>();
+                TableQuerySegment<TodoEntity> todos = await todoTable.ExecuteQuerySegmentedAsync(query, null);
+                
+                string message = "Retrieved all Todos";
+                log.LogInformation(message);
+
+                return new OkObjectResult(new Response
+                {
+                    IsSuccess = true,
+                    Message = message,
+                    Result = todos
+                });
+            }
+
+        // get a specific todo
+        [FunctionName(nameof(GetTodoById))]
+        public static IActionResult GetTodoById(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "todo/{id}")] HttpRequest req,
+        [Table("todo", "TODO", "{id}", Connection = "AzureWebJobsStorage")] TodoEntity todoEntity,
+        string id,
+        ILogger log)
+        {
+            log.LogInformation($"Get todo by id: {id}, received.");
+
+            if (todoEntity == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    IsSuccess = false,
+                    Message = "Todo not found"
+                });
+            }
+
+
+            string message = $"Todo by id: {id}, retrieved";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+                IsSuccess = true,
+                Message = message,
+                Result = todoEntity
+            });
+        }
+
     }
 
 }
