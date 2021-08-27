@@ -21,50 +21,40 @@ namespace todozulu.Test.Helpers
                 RowKey = Guid.NewGuid().ToString(),
                 CreatedTime = DateTime.UtcNow,
                 IsCompleted = false,
-                TaskDescription = "Task: Kill the Humans."
+                TaskDescription = "Task: kill the humans."
             };
         }
 
         public static DefaultHttpRequest CreateHttpRequest(Guid todoId, Todo todoRequest)
         {
             string request = JsonConvert.SerializeObject(todoRequest);
-            DefaultHttpRequest httpRequest = new DefaultHttpRequest(new DefaultHttpContext())
+            return new DefaultHttpRequest(new DefaultHttpContext())
             {
                 Body = GenerateStreamFromString(request),
                 Path = $"/{todoId}"
             };
-
-            return httpRequest;
         }
 
         public static DefaultHttpRequest CreateHttpRequest(Guid todoId)
         {
-            DefaultHttpRequest httpRequest = new DefaultHttpRequest(new DefaultHttpContext())
+            return new DefaultHttpRequest(new DefaultHttpContext())
             {
                 Path = $"/{todoId}"
             };
-
-            return httpRequest;
         }
 
         public static DefaultHttpRequest CreateHttpRequest(Todo todoRequest)
         {
             string request = JsonConvert.SerializeObject(todoRequest);
-            DefaultHttpRequest httpRequest = new DefaultHttpRequest(new DefaultHttpContext())
+            return new DefaultHttpRequest(new DefaultHttpContext())
             {
                 Body = GenerateStreamFromString(request)
             };
-
-            return httpRequest;
         }
 
         public static DefaultHttpRequest CreateHttpRequest()
         {
-            DefaultHttpRequest httpRequest = new DefaultHttpRequest(new DefaultHttpContext())
-            {
-            };
-
-            return httpRequest;
+            return new DefaultHttpRequest(new DefaultHttpContext());
         }
 
         public static Todo GetTodoRequest()
@@ -90,7 +80,6 @@ namespace todozulu.Test.Helpers
         public static ILogger CreateLogger(LoggerTypes type = LoggerTypes.Null)
         {
             ILogger logger;
-
             if (type == LoggerTypes.List)
             {
                 logger = new ListLogger();
@@ -102,6 +91,5 @@ namespace todozulu.Test.Helpers
 
             return logger;
         }
-
     }
 }
